@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import EntryTransition from "./components/transitions/EntryTransition";
 import ParticleScene from "./components/effects/ParticleScene";
 import { useEchoStore } from "./store/echo.store";
+import WorldHUD from "./components/world/WorldHUD";
 
 function App() {
   const view = useEchoStore((state) => state.view);
@@ -17,6 +18,7 @@ function App() {
       {/* 3D environment */}
       <ParticleScene />
       <EntryTransition />
+      <WorldHUD />
 
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0 z-[1]">
