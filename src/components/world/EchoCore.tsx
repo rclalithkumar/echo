@@ -2,37 +2,67 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+import { useEchoStore } from "../../store/echo.store";
+
 export default function EchoCore() {
   const coreRef = useRef<THREE.Mesh>(null);
   const shellRef = useRef<THREE.Mesh>(null);
+
   const ring1Ref = useRef<THREE.Mesh>(null);
   const ring2Ref = useRef<THREE.Mesh>(null);
   const ring3Ref = useRef<THREE.Mesh>(null);
 
-  useFrame((state) => {
+  const view = useEchoStore((state) => state.view);
+
+  useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
+    const entering = view === "entering";
+    const world = view === "world";
+
     if (coreRef.current) {
-      const scale =
+      const idleScale =
         1 + Math.sin(time * 1.8) * 0.055;
+
+      const enteringScale =
+        1 + Math.sin(time * 8) * 0.12;
+
+      const targetScale = entering
+        ? enteringScale
+        : idleScale;
+
+      const scale = THREE.MathUtils.lerp(
+        coreRef.current.scale.x,
+        targetScale,
+        1 - Math.exp(-8 * delta),
+      );
 
       coreRef.current.scale.setScalar(scale);
 
       coreRef.current.rotation.y =
-        time * 0.35;
+        time * (entering ? 1.8 : 0.35);
 
       coreRef.current.rotation.x =
         Math.sin(time * 0.7) * 0.15;
     }
 
     if (shellRef.current) {
-      const scale =
-        1.35 + Math.sin(time * 1.2) * 0.08;
+      const targetScale = entering
+        ? 2.2 + Math.sin(time * 5) * 0.25
+        : world
+          ? 1.5
+          : 1.35 + Math.sin(time * 1.2) * 0.08;
+
+      const scale = THREE.MathUtils.lerp(
+        shellRef.current.scale.x,
+        targetScale,
+        1 - Math.exp(-6 * delta),
+      );
 
       shellRef.current.scale.setScalar(scale);
 
       shellRef.current.rotation.y =
-        -time * 0.12;
+        -time * (entering ? 1.2 : 0.12);
     }
 
     if (ring1Ref.current) {
@@ -40,7 +70,13 @@ export default function EchoCore() {
         Math.PI / 2;
 
       ring1Ref.current.rotation.z =
-        time * 0.35;
+        time * (entering ? 2 : 0.35);
+
+      if (entering) {
+        ring1Ref.current.scale.setScalar(
+          1 + Math.sin(time * 4) * 0.1,
+        );
+      }
     }
 
     if (ring2Ref.current) {
@@ -48,7 +84,7 @@ export default function EchoCore() {
         Math.PI / 3;
 
       ring2Ref.current.rotation.y =
-        time * 0.25;
+        time * (entering ? 1.4 : 0.25);
     }
 
     if (ring3Ref.current) {
@@ -56,7 +92,7 @@ export default function EchoCore() {
         -Math.PI / 4;
 
       ring3Ref.current.rotation.z =
-        -time * 0.2;
+        -time * (entering ? 1.1 : 0.2);
     }
   });
 
@@ -88,7 +124,7 @@ export default function EchoCore() {
         />
       </mesh>
 
-      {/* Inner glow */}
+      {/* Core light */}
       <pointLight
         color="#a78bfa"
         intensity={7}
@@ -96,9 +132,11 @@ export default function EchoCore() {
         decay={2}
       />
 
-      {/* Orbital ring 1 */}
+      {/* Ring 1 */}
       <mesh ref={ring1Ref}>
-        <torusGeometry args={[1.35, 0.012, 16, 160]} />
+        <torusGeometry
+          args={[1.35, 0.012, 16, 160]}
+        />
 
         <meshBasicMaterial
           color="#c4b5fd"
@@ -107,9 +145,11 @@ export default function EchoCore() {
         />
       </mesh>
 
-      {/* Orbital ring 2 */}
+      {/* Ring 2 */}
       <mesh ref={ring2Ref}>
-        <torusGeometry args={[1.65, 0.008, 16, 160]} />
+        <torusGeometry
+          args={[1.65, 0.008, 16, 160]}
+        />
 
         <meshBasicMaterial
           color="#67e8f9"
@@ -118,9 +158,11 @@ export default function EchoCore() {
         />
       </mesh>
 
-      {/* Orbital ring 3 */}
+      {/* Ring 3 */}
       <mesh ref={ring3Ref}>
-        <torusGeometry args={[1.95, 0.006, 16, 160]} />
+        <torusGeometry
+          args={[1.95, 0.006, 16, 160]}
+        />
 
         <meshBasicMaterial
           color="#a78bfa"

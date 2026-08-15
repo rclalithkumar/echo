@@ -1,6 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import ParticleField from "./ParticleField";
 import EchoWorld from "../world/EchoWorld";
+import WorldCamera from "../world/WorldCamera";
 
 export default function ParticleScene() {
   return (
@@ -12,6 +13,7 @@ export default function ParticleScene() {
         }}
         dpr={[1, 2]}
       >
+        <WorldCamera />
         <ParticleField />
         <EchoWorld />
       </Canvas>

@@ -4,6 +4,7 @@ import { useEchoStore } from "../../store/echo.store";
 
 export default function EntryTransition() {
   const view = useEchoStore((state) => state.view);
+
   const completeEntry = useEchoStore(
     (state) => state.completeEntry,
   );
@@ -15,7 +16,7 @@ export default function EntryTransition() {
 
     const timer = window.setTimeout(() => {
       completeEntry();
-    }, 1000);
+    }, 1800);
 
     return () => {
       window.clearTimeout(timer);
