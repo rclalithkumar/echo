@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-
+import { useEchoStore } from "../../store/echo.store";
 const connections = [
   {
     start: [-3, 1.5, -1] as [number, number, number],
@@ -74,6 +74,13 @@ function Connection({
 }
 
 export default function WorldConnections() {
+      const view = useEchoStore(
+    (state) => state.view,
+  );
+
+  if (view === "node") {
+    return null;
+  }
   return (
     <group>
       {connections.map((connection, index) => (

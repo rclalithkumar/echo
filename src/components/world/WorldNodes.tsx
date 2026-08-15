@@ -1,94 +1,71 @@
-import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import * as THREE from "three";
+import WorldNode from "./WorldNode";
 
-type WorldNodeProps = {
-  position: [number, number, number];
-  color: string;
-};
-
-function WorldNode({
-  position,
-  color,
-}: WorldNodeProps) {
-  const groupRef = useRef<THREE.Group>(null);
-  const ringRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
-
-    if (groupRef.current) {
-      groupRef.current.position.y =
-        position[1] +
-        Math.sin(time * 0.7 + position[0]) * 0.08;
-    }
-
-    if (ringRef.current) {
-      ringRef.current.rotation.z =
-        time * 0.35;
-    }
-  });
-
-  return (
-    <group
-      ref={groupRef}
-      position={position}
-    >
-      {/* Core node */}
-      <mesh>
-        <sphereGeometry args={[0.16, 24, 24]} />
-
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={3}
-          roughness={0.2}
-        />
-      </mesh>
-
-      {/* Orbital ring */}
-      <mesh ref={ringRef}>
-        <torusGeometry
-          args={[0.28, 0.006, 12, 64]}
-        />
-
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.55}
-        />
-      </mesh>
-
-      {/* Point light */}
-      <pointLight
-        color={color}
-        intensity={1.5}
-        distance={3}
-        decay={2}
-      />
-    </group>
-  );
-}
+import { useEchoStore } from "../../store/echo.store";
 
 export default function WorldNodes() {
+  const view = useEchoStore(
+    (state) => state.view,
+  );
+
+  const selectedNode =
+    useEchoStore(
+      (state) => state.selectedNode,
+    );
+
+  if (view === "node") {
+    return (
+      <group>
+        {selectedNode && (
+          <WorldNode
+            type={selectedNode}
+            position={
+              selectedNode === "memory"
+                ? [-3, 1.5, -1]
+                : selectedNode === "projects"
+                  ? [3, 1.2, -1.5]
+                  : selectedNode ===
+                      "decisions"
+                    ? [-3, -1.5, -1]
+                    : [3, -1.2, -1.5]
+            }
+            color={
+              selectedNode === "memory"
+                ? "#a78bfa"
+                : selectedNode === "projects"
+                  ? "#67e8f9"
+                  : selectedNode ===
+                      "decisions"
+                    ? "#c4b5fd"
+                    : "#818cf8"
+            }
+          />
+        )}
+      </group>
+    );
+  }
+
   return (
     <group>
       <WorldNode
+        type="memory"
         position={[-3, 1.5, -1]}
         color="#a78bfa"
       />
 
       <WorldNode
+        type="projects"
         position={[3, 1.2, -1.5]}
         color="#67e8f9"
       />
 
       <WorldNode
+        type="decisions"
         position={[-3, -1.5, -1]}
         color="#c4b5fd"
       />
 
       <WorldNode
+        type="possibilities"
         position={[3, -1.2, -1.5]}
         color="#818cf8"
       />

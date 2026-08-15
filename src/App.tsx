@@ -4,6 +4,7 @@ import EntryTransition from "./components/transitions/EntryTransition";
 import ParticleScene from "./components/effects/ParticleScene";
 import { useEchoStore } from "./store/echo.store";
 import WorldHUD from "./components/world/WorldHUD";
+import NodeSpace from "./components/world/NodeSpace";
 
 function App() {
   const view = useEchoStore((state) => state.view);
@@ -19,6 +20,7 @@ function App() {
       <ParticleScene />
       <EntryTransition />
       <WorldHUD />
+      <NodeSpace />
 
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0 z-[1]">
